@@ -8,14 +8,14 @@ cmake ^
     -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ^
     -DCMAKE_INSTALL_LIBDIR=lib ^
     ..
-if errorlevel 1 exit 1
+if %ERRORLEVEL% neq 0 exit %ERRORLEVEL%
 
-cmake --build . --config Release
-if errorlevel 1 exit 1
+cmake --build . --config Release -j %CPU_COUNT%
+if %ERRORLEVEL% neq 0 exit %ERRORLEVEL%
 
 @REM Some of the tests fail in part 2 of the tests (SegFault when build type is Release, unexpected value in one test when build typ is Debug)
 @REM cmake --build . --target check --config Release
-@REM if errorlevel 1 exit 1
+@REM if %ERRORLEVEL% neq 0 exit %ERRORLEVEL%
 
 cmake --build . --target INSTALL --config Release
-if errorlevel 1 exit 1
+if %ERRORLEVEL% neq 0 exit %ERRORLEVEL%
