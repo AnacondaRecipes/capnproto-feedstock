@@ -1,4 +1,4 @@
-{% set version = "1.1.0" %}
+{% set version = "1.5.0" %}
 
 package:
   name: capnproto
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://capnproto.org/capnproto-c++-{{ version }}.tar.gz
-  sha256: 07167580e563f5e821e3b2af1c238c16ec7181612650c5901330fa9a0da50939
+  sha256: 77dbc13ca82d9c87ddb4581dd49559d45b63096433d3dadea08b7f31b360a5ba
 
 build:
   number: 0
@@ -21,13 +21,13 @@ requirements:
   build:
     - cmake  # [win]
     - make  # [not win]
-    - sed   # [osx]
+    - sed  # [osx]
     - gawk  # [osx]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - automake   # [unix]
-    - autoconf   # [unix]
-    - libtool    # [unix]
+    - automake  # [unix]
+    - autoconf  # [unix]
+    - libtool  # [unix]
     - llvm-tools  # [osx]
   host:
     - zlib {{ zlib }}
@@ -42,10 +42,8 @@ test:
     - capnpc --help
     - capnpc-c++ --help
     - capnpc-capnp --help
-
     - test -d "$PREFIX/include/capnp"  # [unix]
     - if not exist %LIBRARY_INC%\\capnp exit 1  # [win]
-
     - test -f "$PREFIX/lib/libcapnp${SHLIB_EXT}"  # [unix]
     - test -f "$PREFIX/lib/libcapnpc${SHLIB_EXT}"  # [unix]
     - test -f "$PREFIX/lib/libcapnp-rpc${SHLIB_EXT}"  # [unix]
