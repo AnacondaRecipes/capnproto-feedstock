@@ -1,12 +1,16 @@
-{% set version = "1.1.0" %}
+{% set name = "capnproto" %}
+{% set version = "1.5.0" %}
 
 package:
-  name: capnproto
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://capnproto.org/capnproto-c++-{{ version }}.tar.gz
-  sha256: 07167580e563f5e821e3b2af1c238c16ec7181612650c5901330fa9a0da50939
+  url: https://github.com/capnproto/capnproto/archive/v{{ version }}.tar.gz
+  sha256: d5ebdf858e9885c33d4b3f765006d68bd66e9b002bf4d607ff4317ef9c1aac6a
+  patches:
+    # MSVC miscompiles async.c++ file when /O2 is given
+    - patches/fix-msvc.diff
 
 build:
   number: 0
@@ -19,12 +23,13 @@ build:
 
 requirements:
   build:
+    - {{ stdlib('c') }}
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - cmake  # [win]
     - make  # [not win]
     - sed   # [osx]
     - gawk  # [osx]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
     - automake   # [unix]
     - autoconf   # [unix]
     - libtool    # [unix]
@@ -33,7 +38,6 @@ requirements:
     - zlib {{ zlib }}
     - openssl {{ openssl }}
   run:
-    - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
     - openssl  # exact pin handled through openssl run_exports
 
 test:
