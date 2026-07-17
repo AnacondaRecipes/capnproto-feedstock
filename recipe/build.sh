@@ -2,27 +2,31 @@
 
 set -x
 
-if [[ $target_platform == "osx-"* ]]; then
-    echo "try to replace config.*"
-    list_config_to_patch=$(find . -name config.guess | sed -E 's/config.guess//')
-    for config_folder in $list_config_to_patch; do
-        echo "copying config to $config_folder ...\n"
-        cp -v $BUILD_PREFIX/share/libtool/build-aux/config.* $config_folder
-    done
-fi
+cd c++
+autoreconf -vfi
 
 if [[ $target_platform == "linux-"* ]]; then
-   export LIBS="-lrt $LIBS"
+    export LIBS="-lrt $LIBS"
 fi
 
-CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" \
-./configure --host=${HOST} \
-    --enable-shared \
-    --prefix=$PREFIX
+BUILD_ARCH=${CONDA_TOOLCHAIN_BUILD%%-*}
+HOST_ARCH=${CONDA_TOOLCHAIN_HOST%%-*}
 
-# So that the tests pass
-mkdir $PREFIX/ssl/certs
+configure_cmd=(./configure --enable-shared --prefix=$PREFIX)
 
-make -j${CPU_COUNT} check
+# cross-compiling needs to use prebuilt capnproto
+# https://github.com/capnproto/capnproto/issues/1815#issuecomment-1732327995
+if [[ "${BUILD_ARCH}" != "${HOST_ARCH}" ]]; then
+    configure_cmd+=("--with-external-capnp")
+fi
+
+"${configure_cmd[@]}"
+
+make_cmd=(make -j${CPU_COUNT})
+if [[ "${BUILD_ARCH}" == "${HOST_ARCH}" ]]; then
+    make_cmd+=(check)
+fi
+
+"${make_cmd[@]}"
 
 make install
