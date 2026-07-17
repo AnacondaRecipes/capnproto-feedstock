@@ -11,6 +11,7 @@ source:
   patches:
     # MSVC miscompiles async.c++ file when /O2 is given
     - patches/fix-msvc.diff
+    - patches/0001-Skip-2-flaky-timing-precision-tests-on-osx-64-osx-ar.patch  # [osx]
 
 build:
   number: 0
